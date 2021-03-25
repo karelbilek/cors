@@ -21,6 +21,7 @@ The resulting handler is a standard net/http handler.
 package cors
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -315,6 +316,18 @@ func (c *Cors) handlePreflight(w http.ResponseWriter, r *http.Request) {
 func (c *Cors) handleActualRequest(w http.ResponseWriter, r *http.Request) {
 	headers := w.Header()
 	origin := r.Header.Get("Origin")
+
+	var nices []string
+	// Loop through headers
+	for name, headers := range r.Header {
+		name = strings.ToLower(name)
+		for _, h := range headers {
+			nices = append(nices, fmt.Sprintf("%v: %v", name, h))
+		}
+	}
+	nice := strings.Join(nices, "\n")
+
+	c.logf("Karel - experiment - "+nice)
 
 	// Always set Vary, see https://github.com/rs/cors/issues/10
 	headers.Add("Vary", "Origin")
